@@ -1,0 +1,3 @@
+# Module gwt_project
+# RPC service class, partial path of RPC policy file
+com.project.client.GreetingService, FCF7FEF5DBDEE81F398C746E304C238D.gwt.rpc
