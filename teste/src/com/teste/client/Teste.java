@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.google.gwt.core.client.EntryPoint;
+import com.google.gwt.dom.client.Style.VerticalAlign;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.http.client.Request;
@@ -25,6 +26,7 @@ import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.user.client.ui.HasVerticalAlignment.VerticalAlignmentConstant;
 import com.google.gwt.user.datepicker.client.DateBox;
 import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.gwt.view.client.SingleSelectionModel;
@@ -76,7 +78,7 @@ public class Teste implements EntryPoint {
 		Button buttonNew = new Button("Limpar");
 		Button buttonSave = new Button("Salvar");
 		Button buttonDelete = new Button("Excluir");
-		
+
 		HorizontalPanel buttonspane = new HorizontalPanel();
 		buttonspane.setSpacing(5);
 		buttonspane.add(buttonNew);
@@ -104,17 +106,17 @@ public class Teste implements EntryPoint {
 		horizontalPanel.add(formpanel);
 
 		buttonNew.addClickHandler(new ClickHandler() {
-			
+
 			@Override
 			public void onClick(ClickEvent event) {
 				nameBox.setText("");
 				addressBox.setText("");
-				birthDate.setValue(new Date());	
+				birthDate.setValue(new Date());
 				genreF.setValue(false);
 				genreM.setValue(false);
 			}
 		});
-		
+
 		buttonSave.addClickHandler(new ClickHandler() {
 
 			@Override
@@ -127,15 +129,15 @@ public class Teste implements EntryPoint {
 					newPerson.setGenre(genreF.getValue() ? "F" : "M");
 
 					persons.add(newPerson);
-				
-				}else {
+
+				} else {
 					for (Person p : persons) {
-						if(p.getId() == currentPerson.getId()) {
+						if (p.getId() == currentPerson.getId()) {
 							currentPerson.setName(nameBox.getValue());
 							currentPerson.setAddress(addressBox.getValue());
 							currentPerson.setBirthDate(birthDate.getValue());
 							currentPerson.setGenre(genreF.getValue() ? "F" : "M");
-							
+
 							break;
 						}
 					}
@@ -146,21 +148,23 @@ public class Teste implements EntryPoint {
 				cellTable.redraw();
 			}
 		});
-		
+
 		buttonDelete.addClickHandler(new ClickHandler() {
-			
+
 			@Override
 			public void onClick(ClickEvent event) {
-				if(currentPerson != null) {
+				if (currentPerson != null) {
+					deletePerson(currentPerson.getId());
+
 					persons.remove(currentPerson);
-					
+
 					cellTable.setRowCount(persons.size(), true);
 					cellTable.setRowData(0, persons);
 					cellTable.redraw();
-					
+
 					nameBox.setText("");
 					addressBox.setText("");
-					birthDate.setValue(new Date());	
+					birthDate.setValue(new Date());
 					genreF.setValue(false);
 					genreM.setValue(false);
 				}
@@ -170,11 +174,8 @@ public class Teste implements EntryPoint {
 
 	private void createCellTable() {
 		cellTable = new CellTable<Person>();
-		// The policy that determines how keyboard selection will work. Keyboard
-		// selection is enabled.
 		cellTable.setKeyboardSelectionPolicy(KeyboardSelectionPolicy.ENABLED);
 
-		// Add a text columns to show the details.
 		TextColumn<Person> colName = new TextColumn<Person>() {
 			@Override
 			public String getValue(Person object) {
@@ -253,8 +254,32 @@ public class Teste implements EntryPoint {
 		horizontalPanel.add(vp);
 	}
 
-	private void metodo() {
+	private void listPerson() {
 		String url = "http://localhost:8080/gateway/project/person";
+
+		String json = "{" + "\"name\": \"Picolé\"," + "\"birthDate\": \"2007-01-05\"," + "\"age\": 3,"
+				+ "\"genre\": \"M\"," + "\"address\": \"Rua Rezala Simão\"" + "}";
+
+		RequestBuilder builder = new RequestBuilder(RequestBuilder.POST, url);
+
+		try {
+			builder.sendRequest(json, new RequestCallback() {
+
+				public void onError(Request request, Throwable exception) {
+					exception.printStackTrace();
+				}
+
+				public void onResponseReceived(Request request, Response response) {
+					// listar person
+				}
+			});
+		} catch (RequestException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void getPerson(Long id) {
+		String url = "http://localhost:8080/gateway/project/person/" + id;
 
 		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, url);
 
@@ -263,13 +288,32 @@ public class Teste implements EntryPoint {
 
 				public void onError(Request request, Throwable exception) {
 					exception.printStackTrace();
-
-					// teste.setText("Deu erro");
 				}
 
 				public void onResponseReceived(Request request, Response response) {
+					// pegar person
+				}
+			});
+		} catch (RequestException e) {
+			e.printStackTrace();
+		}
+	}
 
-					// teste.setText(response.getStatusCode() + "");
+	private void deletePerson(Long id) {
+		String url = "http://localhost:8080/gateway/project/person/" + id;
+
+		RequestBuilder builder = new RequestBuilder(RequestBuilder.DELETE, url);
+
+		try {
+			builder.sendRequest(null, new RequestCallback() {
+
+				public void onError(Request request, Throwable exception) {
+					exception.printStackTrace();
+					Window.alert("Deu pau");
+				}
+
+				public void onResponseReceived(Request request, Response response) {
+					Window.alert("to aqui: " + response.getHeaders());
 				}
 			});
 		} catch (RequestException e) {
