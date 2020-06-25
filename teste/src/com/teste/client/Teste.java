@@ -1,6 +1,7 @@
 package com.teste.client;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import com.google.gwt.core.client.EntryPoint;
@@ -72,7 +73,15 @@ public class Teste implements EntryPoint {
 		hPanel.add(genreF);
 		hPanel.add(genreM);
 
-		Button button = new Button("Salvar");
+		Button buttonNew = new Button("Limpar");
+		Button buttonSave = new Button("Salvar");
+		Button buttonDelete = new Button("Excluir");
+		
+		HorizontalPanel buttonspane = new HorizontalPanel();
+		buttonspane.setSpacing(5);
+		buttonspane.add(buttonNew);
+		buttonspane.add(buttonSave);
+		buttonspane.add(buttonDelete);
 
 		Grid grid = new Grid(5, 2);
 
@@ -84,16 +93,29 @@ public class Teste implements EntryPoint {
 		grid.setWidget(3, 1, hPanel);
 		grid.setWidget(2, 0, addressLabel);
 		grid.setWidget(2, 1, addressBox);
-		grid.setWidget(4, 1, button);
 
-		HorizontalPanel formpanel = new HorizontalPanel();
+		VerticalPanel formpanel = new VerticalPanel();
+		formpanel.setSpacing(10);
 		formpanel.addStyleName("form");
 
+		formpanel.add(buttonspane);
 		formpanel.add(grid);
 
 		horizontalPanel.add(formpanel);
 
-		button.addClickHandler(new ClickHandler() {
+		buttonNew.addClickHandler(new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				nameBox.setText("");
+				addressBox.setText("");
+				birthDate.setValue(new Date());	
+				genreF.setValue(false);
+				genreM.setValue(false);
+			}
+		});
+		
+		buttonSave.addClickHandler(new ClickHandler() {
 
 			@Override
 			public void onClick(ClickEvent event) {
@@ -105,8 +127,7 @@ public class Teste implements EntryPoint {
 					newPerson.setGenre(genreF.getValue() ? "F" : "M");
 
 					persons.add(newPerson);
-					
-					Window.alert("Dados Cadastrados!");
+				
 				}else {
 					for (Person p : persons) {
 						if(p.getId() == currentPerson.getId()) {
@@ -115,7 +136,6 @@ public class Teste implements EntryPoint {
 							currentPerson.setBirthDate(birthDate.getValue());
 							currentPerson.setGenre(genreF.getValue() ? "F" : "M");
 							
-							Window.alert("Dados Atualizados!");
 							break;
 						}
 					}
@@ -124,6 +144,26 @@ public class Teste implements EntryPoint {
 				cellTable.setRowCount(persons.size(), true);
 				cellTable.setRowData(0, persons);
 				cellTable.redraw();
+			}
+		});
+		
+		buttonDelete.addClickHandler(new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				if(currentPerson != null) {
+					persons.remove(currentPerson);
+					
+					cellTable.setRowCount(persons.size(), true);
+					cellTable.setRowData(0, persons);
+					cellTable.redraw();
+					
+					nameBox.setText("");
+					addressBox.setText("");
+					birthDate.setValue(new Date());	
+					genreF.setValue(false);
+					genreM.setValue(false);
+				}
 			}
 		});
 	}
