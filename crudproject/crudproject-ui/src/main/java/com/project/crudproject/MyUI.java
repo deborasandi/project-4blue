@@ -2,10 +2,10 @@ package com.project.crudproject;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.jar.Attributes.Name;
 
 import javax.servlet.annotation.WebServlet;
 
+import com.project.crudproject.http.AgeHttp;
 import com.project.crudproject.http.PersonHttp;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.VaadinServletConfiguration;
@@ -32,6 +32,7 @@ public class MyUI extends UI {
 	final VerticalLayout layout = new VerticalLayout();
 
 	private String URL = "http://localhost:8080/gateway/project/person";
+	private String URL_AGE = "http://localhost:8080/gateway/ageservice/age";
 
 	private Person currentPerson;
 
@@ -53,14 +54,14 @@ public class MyUI extends UI {
 
 		final HorizontalLayout buttonPane = new HorizontalLayout();
 
-		Button newButton = new Button();
+		Button newButton = new Button("Nova Pessoa");
 		newButton.setIcon(VaadinIcons.PLUS);
 
 		newButton.addClickListener(clickEvent -> {
 			clearForm();
 		});
 
-		Button deleteButton = new Button();
+		Button deleteButton = new Button("Excluir Pessoa");
 		deleteButton.setIcon(VaadinIcons.TRASH);
 
 		deleteButton.addClickListener(clickEvent -> {
@@ -74,7 +75,7 @@ public class MyUI extends UI {
 		buttonPane.addComponent(newButton);
 		buttonPane.addComponent(deleteButton);
 
-		form.addComponent(buttonPane);
+		layout.addComponent(buttonPane);
 
 		name = new TextField("Nome");
 		name.setIcon(VaadinIcons.USER);
@@ -110,6 +111,10 @@ public class MyUI extends UI {
 				Person person = new Person();
 
 				person.setName(name.getValue());
+				
+				int age = AgeHttp.calculate(URL_AGE, birthDate.getValue().toString());
+				person.setAge(age);
+				
 				person.setBirthDate(birthDate.getValue().toString());
 				person.setGenre(genre.getValue());
 				person.setAddress(address.getValue());
@@ -117,6 +122,10 @@ public class MyUI extends UI {
 				PersonHttp.create(URL, person);
 			}else {
 				currentPerson.setName(name.getValue());
+				
+				int age = AgeHttp.calculate(URL_AGE, birthDate.getValue().toString());
+				currentPerson.setAge(age);
+				
 				currentPerson.setBirthDate(birthDate.getValue().toString());
 				currentPerson.setGenre(genre.getValue());
 				currentPerson.setAddress(address.getValue());
